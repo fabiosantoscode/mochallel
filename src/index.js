@@ -37,6 +37,8 @@ module.exports = class MochaWrapper extends Mocha {
   }
 
   async run (cb) {
+    let testsPassed = 0
+    let failures = 0
     await Promise.all(this.files.map(file => {
       return this.pool.acquire().then(async cp => {
         cp.send(JSON.stringify({
@@ -60,9 +62,18 @@ module.exports = class MochaWrapper extends Mocha {
           })
         })
 
+        if (code !== 0) {
+          failures += code
+        }
+
         cp.stdout.removeListener('data', onData)
 
-        stdout = stdout.replace(/\n\n  \d+ passing.+\n\n/, '')
+        stdout = stdout.replace(/\n\n  (\d+) passing.+\n\n/, (_, $1) => {
+          if (Number($1)) {
+            testsPassed += Number($1)
+          }
+          return ''
+        })
         process.stdout.write(stdout)
         this.pool.release(cp)
       })
@@ -70,5 +81,11 @@ module.exports = class MochaWrapper extends Mocha {
     this.pool.drain().then(() => {
       this.pool.clear()
     })
+
+    if (failures) {
+      console.log('  ' + failures + ' failed')
+    } else {
+      console.log('  ' + testsPassed + ' passed')
+    }
   }
 }

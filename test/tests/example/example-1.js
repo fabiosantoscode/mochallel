@@ -1,5 +1,5 @@
 describe('example', () => {
   it('foo', () => {
-    return new Promise(r => setTimeout(r, 500))
+    return new Promise(resolve => setTimeout(resolve, 500))
   })
 })

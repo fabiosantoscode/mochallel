@@ -1,6 +1,6 @@
 {
   "name": "mochallel",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "description": "Mocha tests running in parallel",
   "main": "lib/index.js",
   "scripts": {

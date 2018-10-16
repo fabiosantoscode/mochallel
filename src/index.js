@@ -122,5 +122,7 @@ module.exports = class MochaWrapper extends Mocha {
     } else {
       console.log(chalk.green('\n\n  ' + testsPassed + ' passing') + time)
     }
+
+    cb(failures)
   }
 }

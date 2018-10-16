@@ -8,6 +8,18 @@ const genericPool = require('generic-pool')
 const chalk = require('chalk')
 const Mocha = require('mocha')
 
+const compressTime = time => {
+  if (time < 2000) {
+    return time + 'ms'
+  }
+  return Math.round(time / 1000) + 's'
+}
+
+const color = stdout => {
+  return stdout
+    .replace(/(✓)(.+)/g, (_, $0, $1) => chalk.green($0) + chalk.gray($1))
+}
+
 module.exports = class MochaWrapper extends Mocha {
   constructor (options) {
     super(options)
@@ -53,6 +65,7 @@ module.exports = class MochaWrapper extends Mocha {
   async run (cb) {
     let testsPassed = 0
     let failures = 0
+    const timeStart = Date.now()
     await Promise.all(this.files.map((file, index) => {
       return this.pool.acquire().then(async cp => {
         cp.send(JSON.stringify({
@@ -89,6 +102,8 @@ module.exports = class MochaWrapper extends Mocha {
           return ''
         })
 
+        stdout = color(stdout)
+
         this.enqueueIndex(index, () => {
           process.stdout.write(stdout)
         })
@@ -99,10 +114,12 @@ module.exports = class MochaWrapper extends Mocha {
       this.pool.clear()
     })
 
+    const time = chalk.gray(' ' + '(' + compressTime(Date.now() - timeStart) + ')')
+
     if (failures) {
-      console.log(chalk.red('\n\n  ' + failures + ' failed'))
+      console.log(chalk.red('\n\n  ' + failures + ' failing') + time)
     } else {
-      console.log(chalk.green('\n\n  ' + testsPassed + ' passed'))
+      console.log(chalk.green('\n\n  ' + testsPassed + ' passing') + time)
     }
   }
 }

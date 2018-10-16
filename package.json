@@ -5,7 +5,8 @@
   "main": "lib/index.js",
   "scripts": {
     "test": "mocha --require babel-register",
-    "prepare": "babel src -d lib; babel vendor -d lib/vendor"
+    "prepublish": "babel src -d lib; babel vendor -d lib/vendor",
+    "prepare": "npm run prepublish"
   },
   "repository": {
     "type": "git",

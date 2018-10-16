@@ -30,6 +30,9 @@ module.exports = class MochaWrapper extends Mocha {
     })
 
     this.files = []
+
+    this.queue = []
+    this.called = 0
   }
 
   addFile (file) {
@@ -37,10 +40,20 @@ module.exports = class MochaWrapper extends Mocha {
     this.files.push(...files)
   }
 
+  enqueueIndex (index, fn) {
+    if (!this.queue[index]) this.queue[index] = []
+    this.queue[index].push(fn)
+
+    while (this.queue[this.called]) {
+      this.queue[this.called].forEach(fn => fn())
+      this.called++
+    }
+  }
+
   async run (cb) {
     let testsPassed = 0
     let failures = 0
-    await Promise.all(this.files.map(file => {
+    await Promise.all(this.files.map((file, index) => {
       return this.pool.acquire().then(async cp => {
         cp.send(JSON.stringify({
           type: 'test',
@@ -75,7 +88,10 @@ module.exports = class MochaWrapper extends Mocha {
           }
           return ''
         })
-        process.stdout.write(stdout)
+
+        this.enqueueIndex(index, () => {
+          process.stdout.write(stdout)
+        })
         this.pool.release(cp)
       })
     }))

@@ -1,5 +1,6 @@
 'use strict'
 
+require('babel-polyfill')
 const fs = require('fs')
 const os = require('os')
 const path = require('path')

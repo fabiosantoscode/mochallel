@@ -9,8 +9,12 @@ This module was inspired in mocha-parallel-tests, but instead of going the same 
 Use just exactly like mocha.
 
 ```bash
-mochallel --timeout 2000 --slow 500 path/to/your/tests
+mochallel --maxParallel 2 --timeout 2000 --slow 500 path/to/your/tests
 ```
+
+Use the `--maxParallel <n>` option to specify how many parallel processes you want.
+
+The other options are exactly like mocha.
 
 ## How to use (API)
 

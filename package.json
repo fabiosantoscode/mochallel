@@ -29,6 +29,7 @@
     "mocha": "^5.2.0"
   },
   "dependencies": {
+    "chalk": "^2.4.1",
     "generic-pool": "^3.4.2",
     "mocha-parallel-tests": "^2.0.4"
   }

@@ -5,6 +5,7 @@ const os = require('os')
 const path = require('path')
 const { fork } = require('child_process')
 const genericPool = require('generic-pool')
+const chalk = require('chalk')
 const Mocha = require('mocha')
 
 module.exports = class MochaWrapper extends Mocha {
@@ -68,7 +69,7 @@ module.exports = class MochaWrapper extends Mocha {
 
         cp.stdout.removeListener('data', onData)
 
-        stdout = stdout.replace(/\n\n  (\d+) passing.+\n\n/, (_, $1) => {
+        stdout = stdout.replace(/\n\n\n  (\d+) passing.+\n\n/, (_, $1) => {
           if (Number($1)) {
             testsPassed += Number($1)
           }
@@ -83,9 +84,9 @@ module.exports = class MochaWrapper extends Mocha {
     })
 
     if (failures) {
-      console.log('  ' + failures + ' failed')
+      console.log(chalk.red('\n\n  ' + failures + ' failed'))
     } else {
-      console.log('  ' + testsPassed + ' passed')
+      console.log(chalk.green('\n\n  ' + testsPassed + ' passed'))
     }
   }
 }

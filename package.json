@@ -11,6 +11,10 @@
     "type": "git",
     "url": "git+https://github.com/fabiosantoscode/mochallel.git"
   },
+  "directories": {
+    "bin": "bin",
+    "lib": "lib"
+  },
   "author": "",
   "license": "ISC",
   "bugs": {

@@ -1,4 +1,7 @@
 # mochallel
+
+[![Build Status](https://travis-ci.org/fabiosantoscode/mochallel.svg?branch=master)](https://travis-ci.org/fabiosantoscode/mochallel)
+
 Mocha tests running in parallel
 
 ## comparison with mocha-parallel-tests

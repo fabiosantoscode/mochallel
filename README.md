@@ -29,3 +29,7 @@ mocha.run(code => {
     process.exit(code)
 })
 ```
+
+Use the `maxParallel` option to specify how many parallel processes you want.
+
+All other options exactly like mocha.

@@ -5,7 +5,7 @@ const fs = require('fs')
 const os = require('os')
 const path = require('path')
 const { fork } = require('child_process')
-const genericPool = require('../vendor/generic-pool')
+const genericPool = require('./vendor/generic-pool')
 const chalk = require('chalk')
 const Mocha = require('mocha')
 

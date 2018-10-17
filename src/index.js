@@ -36,12 +36,16 @@ module.exports = class MochaWrapper extends Mocha {
           stdio: ['ipc']
         })
 
+        cp.on('exit', () => {
+          console.log('exited')
+        })
+
         return new Promise(resolve => {
           cp.once('message', () => { resolve(cp) })
         })
       },
       destroy (cp) {
-        cp.kill()
+        cp.disconnect()
       }
     }, {
       max: options.maxParallel || os.cpus().length
@@ -87,7 +91,12 @@ module.exports = class MochaWrapper extends Mocha {
           stdout += data
         }
 
+        let firstInactivityInterval = true
         const inactivityInterval = setInterval(() => {
+          if (firstInactivityInterval) {
+            firstInactivityInterval = false
+            process.stdout.write('\n')
+          }
           console.log('still running...')
         }, 2 * 60 * 1000)
 

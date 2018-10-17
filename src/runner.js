@@ -9,7 +9,7 @@ process.on('message', msg => {
     const mocha = new Mocha(options)
     mocha.addFile(file)
     mocha.run((code) => {
-      process.send(JSON.stringify({code}))
+      process.send(JSON.stringify({ code }))
     })
   }
 })

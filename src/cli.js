@@ -30,7 +30,7 @@ module.exports = () => {
 
   const mocha = new Mocha(program)
 
-  inputFiles.forEach(file => {
+  ;(Array.isArray(inputFiles) ? inputFiles : [inputFiles]).forEach(file => {
     if (fs.existsSync(file)) mocha.addFile(file)
   })
 

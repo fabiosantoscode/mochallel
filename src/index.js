@@ -6,8 +6,10 @@ const os = require('os')
 const path = require('path')
 const { fork } = require('child_process')
 const genericPool = require('./vendor/generic-pool')
-const chalk = require('chalk')
+const semver = require('semver')
 const Mocha = require('mocha')
+const identity = x => x
+const chalk = semver.satisfies(process.version, ">4") ? require('chalk') : {green: identity, gray: identity, red: identity}
 
 const compressTime = time => {
   if (time < 2000) {

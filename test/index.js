@@ -1,6 +1,6 @@
 'use strict'
 
-const Mochallel = require('..')
+const Mochallel = require('../src')
 const path = require('path')
 
 describe('mochallel', () => {

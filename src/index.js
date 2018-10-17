@@ -84,6 +84,10 @@ module.exports = class MochaWrapper extends Mocha {
           stdout += data
         }
 
+        const inactivityInterval = setInterval(() => {
+          console.log('still running...')
+        }, 5 * 60 * 1000)
+
         const code = await new Promise(resolve => {
           cp.once('message', msg => {
             const { code } = JSON.parse(msg)
@@ -91,6 +95,8 @@ module.exports = class MochaWrapper extends Mocha {
             resolve(code)
           })
         })
+
+        clearInterval(inactivityInterval)
 
         if (code !== 0) {
           failures += code

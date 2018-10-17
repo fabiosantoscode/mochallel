@@ -4,7 +4,7 @@
   "description": "Mocha tests running in parallel",
   "main": "lib/index.js",
   "scripts": {
-    "test": "istanbul cover ./node_modules/.bin/_mocha",
+    "test": "istanbul cover ./node_modules/.bin/_mocha -x '**/vendor/**'",
     "prepublish": "babel src -d lib; babel vendor -d lib/vendor",
     "prepare": "npm run prepublish",
     "precommit": "npm run lint --silent && npm run test --silent",

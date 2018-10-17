@@ -5,11 +5,12 @@ const fs = require('fs')
 const os = require('os')
 const path = require('path')
 const { fork } = require('child_process')
-const genericPool = require('./vendor/generic-pool')
 const semver = require('semver')
+const circularJson = require('circular-json')
 const Mocha = require('mocha')
 const identity = x => x
 const chalk = semver.satisfies(process.version, '>4') ? require('chalk') : { green: identity, gray: identity, red: identity }
+const genericPool = require('./vendor/generic-pool')
 
 const compressTime = time => {
   if (time < 2000) {
@@ -73,7 +74,7 @@ module.exports = class MochaWrapper extends Mocha {
     const timeStart = Date.now()
     await Promise.all(this.files.map((file, index) => {
       return this.pool.acquire().then(async cp => {
-        cp.send(JSON.stringify({
+        cp.send(circularJson.stringify({
           type: 'test',
           file: file,
           options: this.options

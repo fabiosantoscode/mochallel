@@ -1,9 +1,10 @@
 'use strict'
 
+const circularJson = require('circular-json')
 const Mocha = require('mocha')
 
 process.on('message', msg => {
-  const { type, file, options } = JSON.parse(msg)
+  const { type, file, options } = circularJson.parse(msg)
 
   if (type === 'test') {
     const mocha = new Mocha(options)

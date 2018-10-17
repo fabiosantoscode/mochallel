@@ -38,7 +38,7 @@ module.exports = class MochaWrapper extends Mocha {
         })
       },
       destroy (cp) {
-        cp.disconnect()
+        cp.kill()
       }
     }, {
       max: options.maxParallel || os.cpus().length

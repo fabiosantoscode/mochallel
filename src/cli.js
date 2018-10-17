@@ -1,32 +1,39 @@
 'use strict'
 
+const fs = require('fs')
 const Mocha = require('..')
-const yargs = require('yargs')
+const program = require('commander')
 
-module.exports = (processArgv) => {
-  const argv = yargs
-    .boolean('bail')
-    .option('compilers', {
-      array: true,
-      default: []
+module.exports = () => {
+  let inputFiles = ['test']
+  program
+    .option('--bail')
+    .option('--compilers')
+    .option('--delay [n]')
+    .option('--grep [s]')
+    .option('--enableTimeouts')
+    .option('--exit')
+    .option('--slow [t]')
+    .option('--require')
+    .option('--retries')
+    .option('--timeout')
+    .option('--maxParallel')
+    .arguments('[...files]')
+    .action(files => {
+      console.log({files})
+      inputFiles = files
     })
-    .boolean('delay')
-    .string('grep')
-    .boolean('enableTimeouts')
-    .option('exit', { boolean: true })
-    .number('slow')
-    .option('require', {
-      array: true,
-      default: []
-    })
-    .number('retries')
-    .number('timeout')
-    .number('maxParallel')
-    .parse(processArgv)
+    .parse(process.argv)
 
-  const mocha = new Mocha(argv)
 
-  argv._.forEach(file => { mocha.addFile(file) })
+  program.compilers = program.compilers || []
+  program.require = program.require || []
+
+  const mocha = new Mocha(program)
+
+  inputFiles.forEach(file => {
+    if (fs.existsSync(file)) mocha.addFile(file)
+  })
 
   mocha.run(code => {
     process.exit(code)

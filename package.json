@@ -43,6 +43,7 @@
   "dependencies": {
     "babel-polyfill": "^6.26.0",
     "chalk": "^2.4.1",
+    "circular-json": "^0.5.7",
     "commander": "^2.19.0"
   }
 }

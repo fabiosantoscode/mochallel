@@ -20,11 +20,10 @@ module.exports = () => {
     .option('--maxParallel')
     .arguments('[...files]')
     .action(files => {
-      console.log({files})
+      console.log({ files })
       inputFiles = files
     })
     .parse(process.argv)
-
 
   program.compilers = program.compilers || []
   program.require = program.require || []

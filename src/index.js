@@ -9,7 +9,7 @@ const genericPool = require('./vendor/generic-pool')
 const semver = require('semver')
 const Mocha = require('mocha')
 const identity = x => x
-const chalk = semver.satisfies(process.version, ">4") ? require('chalk') : {green: identity, gray: identity, red: identity}
+const chalk = semver.satisfies(process.version, '>4') ? require('chalk') : { green: identity, gray: identity, red: identity }
 
 const compressTime = time => {
   if (time < 2000) {
@@ -88,7 +88,7 @@ module.exports = class MochaWrapper extends Mocha {
 
         const inactivityInterval = setInterval(() => {
           console.log('still running...')
-        }, 5 * 60 * 1000)
+        }, 2 * 60 * 1000)
 
         const code = await new Promise(resolve => {
           cp.once('message', msg => {

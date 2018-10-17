@@ -1,5 +1,7 @@
-describe('example 2', () => {
-  it('foo 2', () => {
-    return new Promise(resolve => setTimeout(resolve, 250))
+const Promise = require('es6-promise')
+
+describe('example 2', function () {
+  it('foo 2', function () {
+    return new Promise(function (resolve) { setTimeout(resolve, 250) })
   })
 })

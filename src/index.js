@@ -4,7 +4,7 @@ require('babel-polyfill')
 const fs = require('fs')
 const os = require('os')
 const path = require('path')
-const { spawn } = require('child_process')
+const { fork, spawn } = require('child_process')
 const semver = require('semver')
 const Mocha = require('mocha')
 const identity = x => x
@@ -31,9 +31,12 @@ module.exports = class MochaWrapper extends Mocha {
 
     this.pool = genericPool.createPool({
       async create () {
-        const cp = spawn('node', [path.join(__dirname, 'runner.js')], {
-          stdio: ['pipe', 'pipe', 'ipc']
-        })
+        const runner = path.join(__dirname, 'runner.js')
+        const cp = semver.satisfies(process.version, '>=10')
+          ? fork(runner, [], { stdio: ['ipc'] })
+          : spawn('node', [runner], {
+            stdio: ['pipe', 'pipe', 'ipc']
+          })
 
         return new Promise(resolve => {
           cp.once('message', () => { resolve(cp) })

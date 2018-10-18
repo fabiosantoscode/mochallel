@@ -46,7 +46,7 @@ module.exports = class MochaWrapper extends Mocha {
         cp.disconnect()
       }
     }, {
-      max: options.maxParallel || os.cpus().length
+      max: (options || {}).maxParallel || os.cpus().length
     })
 
     this.files = []

@@ -1,6 +1,6 @@
 # mochallel
 
-[![Build Status](https://travis-ci.org/fabiosantoscode/mochallel.svg?branch=master)](https://travis-ci.org/fabiosantoscode/mochallel)
+[![Build Status](https://travis-ci.org/fabiosantoscode/mochallel.svg?branch=master)](https://travis-ci.org/fabiosantoscode/mochallel) [![Coverage Status](https://coveralls.io/repos/github/fabiosantoscode/mochallel/badge.svg?branch=master)](https://coveralls.io/github/fabiosantoscode/mochallel?branch=master)
 
 Mocha tests running in parallel
 

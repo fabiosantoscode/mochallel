@@ -1,6 +1,6 @@
 'use strict'
 
-const assert = require('assert')
+var assert = require('assert')
 var path = require('path')
 var Mochallel = require('..')
 

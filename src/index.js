@@ -12,7 +12,7 @@ const chalk = semver.satisfies(process.version, '>4') ? require('chalk') : { gre
 const genericPool = require('./vendor/generic-pool')
 
 const compressTime = time => {
-  if (time < 2000) {
+  if (time < 1000) {
     return time + 'ms'
   }
   return Math.round(time / 1000) + 's'

@@ -1,11 +1,8 @@
 'use strict'
 
-const circularJson = require('circular-json')
 const Mocha = require('mocha')
 
-process.on('message', msg => {
-  const { type, file, options } = circularJson.parse(msg)
-
+process.on('message', ({ type, file, options }) => {
   if (type === 'test') {
     const mocha = new Mocha(options)
     mocha.addFile(file)
@@ -15,4 +12,4 @@ process.on('message', msg => {
   }
 })
 
-process.send('')
+process.send(null)

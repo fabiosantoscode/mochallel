@@ -4,9 +4,8 @@ require('babel-polyfill')
 const fs = require('fs')
 const os = require('os')
 const path = require('path')
-const { fork } = require('child_process')
+const { spawn } = require('child_process')
 const semver = require('semver')
-const circularJson = require('circular-json')
 const Mocha = require('mocha')
 const identity = x => x
 const chalk = semver.satisfies(process.version, '>4') ? require('chalk') : { green: identity, gray: identity, red: identity }
@@ -32,12 +31,8 @@ module.exports = class MochaWrapper extends Mocha {
 
     this.pool = genericPool.createPool({
       async create () {
-        const cp = fork(path.join(__dirname, 'runner.js'), {
-          stdio: ['ipc']
-        })
-
-        cp.on('exit', () => {
-          console.log('exited')
+        const cp = spawn('node', [path.join(__dirname, 'runner.js')], {
+          stdio: ['pipe', 'pipe', 'ipc']
         })
 
         return new Promise(resolve => {
@@ -78,11 +73,11 @@ module.exports = class MochaWrapper extends Mocha {
     const timeStart = Date.now()
     await Promise.all(this.files.map((file, index) => {
       return this.pool.acquire().then(async cp => {
-        cp.send(circularJson.stringify({
+        cp.send({
           type: 'test',
           file: file,
           options: this.options
-        }))
+        })
 
         let stdout = ''
         cp.stdout.on('data', onData)

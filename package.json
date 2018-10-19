@@ -2,6 +2,12 @@
   "name": "mochallel",
   "version": "1.7.1",
   "description": "Mocha tests running in parallel",
+  "keywords": [
+    "mocha",
+    "parallel",
+    "testing",
+    "test"
+  ],
   "main": "lib/index.js",
   "scripts": {
     "test": "istanbul cover -x '**/vendor/**' ./node_modules/.bin/_mocha --require=babel-register && coveralls < coverage/lcov.info",

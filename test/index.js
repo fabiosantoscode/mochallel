@@ -29,7 +29,6 @@ describe('mochallel', function () {
     var clock = sinon.useFakeTimers()
     mocha.run(function (code) {
       assert.strictEqual(code, 0)
-      console.log(console.log.firstCall)
       assert(console.log.firstCall)
       done()
     })

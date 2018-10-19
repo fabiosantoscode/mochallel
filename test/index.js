@@ -3,7 +3,6 @@
 var assert = require('assert')
 var path = require('path')
 var Mochallel = require('..')
-var sinon = require('sinon')
 
 describe('mochallel', function () {
   this.timeout(4 * 1000)
@@ -21,17 +20,5 @@ describe('mochallel', function () {
       assert.strictEqual(code, 1)
       done()
     })
-  })
-  it('prints a message on long-running tests', function (done) {
-    var mocha = new Mochallel()
-    mocha.addFile(path.join(__dirname, 'tests/long-running'))
-    sinon.spy(console, 'log')
-    var clock = sinon.useFakeTimers()
-    mocha.run(function (code) {
-      assert.strictEqual(code, 0)
-      assert(console.log.firstCall)
-      done()
-    })
-    clock.tick(2 * 60 * 1000)
   })
 })

@@ -29,10 +29,10 @@ describe('mochallel', function () {
     var clock = sinon.useFakeTimers()
     mocha.run(function (code) {
       assert.strictEqual(code, 0)
-      console.log(console.log.callCount)
-      assert(console.log.called)
+      console.log(console.log.firstCall)
+      assert(console.log.firstCall)
       done()
     })
-    clock.tick(6 * 60 * 1000)
+    clock.tick(2 * 60 * 1000)
   })
 })

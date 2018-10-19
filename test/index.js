@@ -2,7 +2,7 @@
 
 var assert = require('assert')
 var path = require('path')
-var Mochallel = require('../src')
+var Mochallel = require('..')
 var sinon = require('sinon')
 
 describe('mochallel', function () {

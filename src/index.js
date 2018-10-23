@@ -21,7 +21,7 @@ const color = stdout => {
     .replace(/(✓)(.+)/g, (_, $0, $1) => chalk.green($0) + chalk.gray($1))
     .replace(/(\d+\).+)/g, (_, $0) => chalk.red($0))
     .replace(/(\(\d+ms\))/, (_, $0) => chalk.red($0))
-    .replace(/((Uncaught|Error) .+)/, (_, $0) => chalk.red($0))
+    .replace(/(\s+(Uncaught|Error) .+)/, (_, $0) => chalk.red($0))
 }
 
 module.exports = class MochaWrapper extends Mocha {

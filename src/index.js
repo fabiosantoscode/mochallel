@@ -2,15 +2,12 @@
 
 require('babel-polyfill')
 const fs = require('fs')
-const os = require('os')
 const path = require('path')
-const { fork, spawn } = require('child_process')
 const semver = require('semver')
 const Mocha = require('mocha')
 const identity = x => x
 const chalk = semver.satisfies(process.version, '>4') ? require('chalk') : { green: identity, gray: identity, red: identity }
-const genericPool = require('./vendor/generic-pool')
-const circularJson = require('circular-json')
+const map = require('multiprocess-map')
 
 const compressTime = time => {
   if (time < 1000) {
@@ -31,28 +28,7 @@ module.exports = class MochaWrapper extends Mocha {
   constructor (options) {
     super(options)
 
-    this.pool = genericPool.createPool({
-      async create () {
-        const runner = path.join(__dirname, 'runner.js')
-        const cp = semver.satisfies(process.version, '>=10')
-          ? fork(runner, [], { stdio: ['ipc'] })
-          : spawn('node', [runner], {
-            stdio: ['pipe', 'pipe', 'ipc']
-          })
-
-        return new Promise(resolve => {
-          cp.once('message', () => { resolve(cp) })
-        })
-      },
-      destroy (cp) {
-        cp.disconnect()
-      }
-    }, {
-      max: (options || {}).maxParallel || os.cpus().length
-    })
-
     this.files = []
-
     this.queue = []
     this.called = 0
   }
@@ -72,77 +48,55 @@ module.exports = class MochaWrapper extends Mocha {
     }
   }
 
-  async run (cb) {
+  run (cb) {
     let testsPassed = 0
-    let failures = 0
+    let firstInactivityInterval = true
+    const inactivityInterval = setInterval(() => {
+      if (firstInactivityInterval) {
+        firstInactivityInterval = false
+        process.stdout.write('\n')
+      }
+      console.log('still running...')
+    }, 2 * 60 * 1000)
     const timeStart = Date.now()
-    await Promise.all(this.files.map((file, index) => {
-      return this.pool.acquire().then(async cp => {
-        cp.send(circularJson.stringify({
-          type: 'test',
-          file: file,
-          options: this.options
-        }))
-
-        let stdout = ''
-        cp.stdout.on('data', onData)
-
-        function onData (data) {
-          stdout += data
-        }
-
-        let firstInactivityInterval = true
-        const inactivityInterval = setInterval(() => {
-          if (firstInactivityInterval) {
-            firstInactivityInterval = false
-            process.stdout.write('\n')
-          }
-          console.log('still running...')
-        }, 2 * 60 * 1000)
-
-        const code = await new Promise(resolve => {
-          cp.once('message', msg => {
-            const { code } = circularJson.parse(msg)
-
-            resolve(code)
-          })
-        })
-
-        clearInterval(inactivityInterval)
-
-        if (code !== 0) {
-          failures += code
-        }
-
-        cp.stdout.removeListener('data', onData)
-
-        stdout = stdout.replace(/\n\n\n {2}(\d+) passing.+\n\n/, (_, $1) => {
-          if (Number($1)) {
-            testsPassed += Number($1)
-          }
-          return ''
-        })
-
-        stdout = color(stdout)
-
-        this.enqueueIndex(index, () => {
-          process.stdout.write(stdout)
-        })
-        this.pool.release(cp)
-      })
+    const testFiles = this.files.map(file => ({
+      type: 'test',
+      file: file,
+      options: this.options
     }))
-    this.pool.drain().then(() => {
-      this.pool.clear()
-    })
+    const processStdout = stdout => {
+      stdout = stdout.replace(/\n\n\n {2}(\d+) passing.+\n\n/, (_, $1) => {
+        if (Number($1)) {
+          testsPassed += Number($1)
+        }
+        return ''
+      })
 
-    const time = chalk.gray(' ' + '(' + compressTime(Date.now() - timeStart) + ')')
-
-    if (failures) {
-      console.log(chalk.red('\n\n  ' + failures + ' failing') + time)
-    } else {
-      console.log(chalk.green('\n\n  ' + testsPassed + ' passing') + time)
+      return color(stdout)
     }
 
-    cb(failures)
+    return map(testFiles, ({ file, options }) => {
+      const Mocha = require('mocha')
+      const mocha = new Mocha(options)
+
+      mocha.addFile(file)
+
+      return new Promise(resolve => {
+        mocha.run(resolve)
+      })
+    }, { max: this.options.maxParallel, processStdout }).then((codes) => {
+      clearInterval(inactivityInterval)
+
+      const time = chalk.gray(' ' + '(' + compressTime(Date.now() - timeStart) + ')')
+
+      const failures = codes.reduce((a, b) => a + b)
+      if (failures) {
+        console.log(chalk.red('\n\n  ' + failures + ' failing') + time)
+      } else {
+        console.log(chalk.green('\n\n  ' + testsPassed + ' passing') + time)
+      }
+
+      cb(failures)
+    })
   }
 }

@@ -77,6 +77,7 @@ module.exports = class MochaWrapper extends Mocha {
 
     return map(testFiles, ({ file, options }) => {
       const Mocha = require('mocha')
+      const Promise = require('es6-promise')
       const mocha = new Mocha(options)
 
       mocha.addFile(file)

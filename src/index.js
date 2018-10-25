@@ -37,11 +37,10 @@ module.exports = class MochaWrapper extends Mocha {
   }
 
   enqueueIndex (index, fn) {
-    if (!this.queue[index]) this.queue[index] = []
-    this.queue[index].push(fn)
+    this.queue[index] = fn
 
     while (this.queue[this.called]) {
-      this.queue[this.called].forEach(fn => fn())
+      this.queue[this.called]()
       this.called++
     }
   }

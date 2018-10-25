@@ -57,7 +57,6 @@ module.exports = class MochaWrapper extends Mocha {
     }, 2 * 60 * 1000)
     const timeStart = Date.now()
     const testFiles = this.files.map(file => ({
-      type: 'test',
       file: file,
       options: this.options
     }))

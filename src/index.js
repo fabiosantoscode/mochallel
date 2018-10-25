@@ -3,10 +3,8 @@
 require('babel-polyfill')
 const fs = require('fs')
 const path = require('path')
-const semver = require('semver')
 const Mocha = require('mocha')
-const identity = x => x
-const chalk = semver.satisfies(process.version, '>4') ? require('chalk') : { green: identity, gray: identity, red: identity }
+const chalk = require('chalk')
 const map = require('multiprocess-map')
 
 const compressTime = time => {

@@ -3,6 +3,8 @@ node_js:
     - "0.10"
     - "4"
     - "10"
+before_script:
+  - npm run prepare
 cache:
   directories:
     - node_modules

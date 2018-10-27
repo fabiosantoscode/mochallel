@@ -54,7 +54,7 @@ module.exports = class MochaWrapper extends Mocha {
         process.stdout.write('\n')
       }
       console.log('still running...')
-    }, 2 * 60 * 1000)
+    }, 5 * 60 * 1000)
     const timeStart = Date.now()
     const testFiles = this.files.map(file => ({
       type: 'test',

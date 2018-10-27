@@ -18,8 +18,8 @@ const color = stdout => {
   return stdout
     .replace(/(✓)(.+)/g, (_, $0, $1) => chalk.green($0) + chalk.gray($1))
     .replace(/(\d+\).+)/g, (_, $0) => chalk.red($0))
-    .replace(/(\(\d+ms\))/, (_, $0) => chalk.red($0))
-    .replace(/(\s+(Uncaught|Error) .+)/, (_, $0) => chalk.red($0))
+    .replace(/(\(\d+ms\))/g, (_, $0) => chalk.red($0))
+    .replace(/(\s+(Uncaught|Error)g .+)/, (_, $0) => chalk.red($0))
 }
 
 module.exports = class MochaWrapper extends Mocha {
@@ -62,7 +62,7 @@ module.exports = class MochaWrapper extends Mocha {
       options: this.options
     }))
     const processStdout = stdout => {
-      stdout = stdout.replace(/\n\n\n {2}(\d+) passing.+\n\n/, (_, $1) => {
+      stdout = stdout.replace(/\n{3} {2}(\d+) passing.+\n\n/, (_, $1) => {
         if (Number($1)) {
           testsPassed += Number($1)
         }

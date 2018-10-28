@@ -15,9 +15,6 @@
     "precommit": "npm run lint --silent && npm run test --silent",
     "lint": "eslint --fix 'src/**/*.js' --ignore-pattern 'vendor'"
   },
-  "files": [
-    "lib"
-  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/fabiosantoscode/mochallel.git"

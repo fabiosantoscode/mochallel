@@ -1,6 +1,6 @@
 'use strict'
 
-require('babel-polyfill')
+if (!global._babelPolyfill) require('babel-polyfill')
 const fs = require('fs')
 const path = require('path')
 const Mocha = require('mocha')

@@ -2,25 +2,11 @@
 
 if (!global._babelPolyfill) require('babel-polyfill')
 const fs = require('fs')
+const events = require('events')
 const path = require('path')
 const Mocha = require('mocha')
-const chalk = require('chalk')
 const map = require('multiprocess-map')
-
-const compressTime = time => {
-  if (time < 1000) {
-    return time + 'ms'
-  }
-  return Math.round(time / 1000) + 's'
-}
-
-const color = stdout => {
-  return stdout
-    .replace(/(✓)(.+)/g, (_, $0, $1) => chalk.green($0) + chalk.gray($1))
-    .replace(/(\d+\).+)/g, (_, $0) => chalk.red($0))
-    .replace(/(\(\d+m?s?\))/g, (_, $0) => chalk.red($0))
-    .replace(/(\s+(Uncaught|Error)g .+)/, (_, $0) => chalk.red($0))
-}
+const TapParser = require('tap-parser')
 
 module.exports = class MochaWrapper extends Mocha {
   constructor (options) {
@@ -46,28 +32,39 @@ module.exports = class MochaWrapper extends Mocha {
   }
 
   async run (cb) {
-    const timeStart = Date.now()
     const testFiles = this.files.map(file => ({
       type: 'test',
       file: file,
       options: this.options
     }))
-    let testsPassed = 0
-    const processStdout = stdout => {
-      stdout = stdout.replace(/\n{3} {2}(\d+) passing.+\n\n/, (_, $1) => {
-        if (Number($1)) {
-          testsPassed += Number($1)
+    var p = new TapParser()
+    const runner = new events.EventEmitter()
+    /* eslint-disable-line */ new this._reporter(runner)
+    runner.emit('start')
+    let previousTest = Date.now()
+    p.on('line', line => {
+      const duration = Date.now() - previousTest
+      previousTest = Date.now()
+      if (/^(not )?ok/.test(line)) {
+        const passed = /^ok/.test(line)
+        const title = line.replace(/^(not )?ok/, '').trim()
+        if (passed) {
+          runner.emit('pass', { title, slow: () => 100, duration })
+        } else {
+          runner.emit('fail', { title })
         }
-        return ''
-      })
-
-      return color(stdout)
+      }
+    })
+    const processStdout = stdout => {
+      p.write(stdout)
     }
 
     const codes = await map(testFiles, ({ file, options }) => {
       const Mocha = require('mocha')
       const Promise = require('es6-promise')
       const mocha = new Mocha(options)
+
+      mocha.reporter('tap')
 
       mocha.addFile(file)
 
@@ -76,14 +73,7 @@ module.exports = class MochaWrapper extends Mocha {
       })
     }, { max: this.options.maxParallel, processStdout })
 
-    const time = chalk.gray(' ' + '(' + compressTime(Date.now() - timeStart) + ')')
-
     const failures = codes.reduce((a, b) => a + b)
-    if (failures) {
-      console.log(chalk.red('\n\n  ' + failures + ' failing') + time)
-    } else {
-      console.log(chalk.green('\n\n  ' + testsPassed + ' passing') + time)
-    }
 
     cb(failures)
   }

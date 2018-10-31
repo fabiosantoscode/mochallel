@@ -18,7 +18,7 @@ const color = stdout => {
   return stdout
     .replace(/(✓)(.+)/g, (_, $0, $1) => chalk.green($0) + chalk.gray($1))
     .replace(/(\d+\).+)/g, (_, $0) => chalk.red($0))
-    .replace(/(\(\d+ms\))/g, (_, $0) => chalk.red($0))
+    .replace(/(\(\d+m?s?\))/g, (_, $0) => chalk.red($0))
     .replace(/(\s+(Uncaught|Error)g .+)/, (_, $0) => chalk.red($0))
 }
 
@@ -45,22 +45,14 @@ module.exports = class MochaWrapper extends Mocha {
     }
   }
 
-  run (cb) {
-    let testsPassed = 0
-    let firstInactivityInterval = true
-    const inactivityInterval = setInterval(() => {
-      if (firstInactivityInterval) {
-        firstInactivityInterval = false
-        process.stdout.write('\n')
-      }
-      console.log('still running...')
-    }, 5 * 60 * 1000)
+  async run (cb) {
     const timeStart = Date.now()
     const testFiles = this.files.map(file => ({
       type: 'test',
       file: file,
       options: this.options
     }))
+    let testsPassed = 0
     const processStdout = stdout => {
       stdout = stdout.replace(/\n{3} {2}(\d+) passing.+\n\n/, (_, $1) => {
         if (Number($1)) {
@@ -72,7 +64,7 @@ module.exports = class MochaWrapper extends Mocha {
       return color(stdout)
     }
 
-    return map(testFiles, ({ file, options }) => {
+    const codes = await map(testFiles, ({ file, options }) => {
       const Mocha = require('mocha')
       const Promise = require('es6-promise')
       const mocha = new Mocha(options)
@@ -82,19 +74,17 @@ module.exports = class MochaWrapper extends Mocha {
       return new Promise(resolve => {
         mocha.run(resolve)
       })
-    }, { max: this.options.maxParallel, processStdout }).then((codes) => {
-      clearInterval(inactivityInterval)
+    }, { max: this.options.maxParallel, processStdout })
 
-      const time = chalk.gray(' ' + '(' + compressTime(Date.now() - timeStart) + ')')
+    const time = chalk.gray(' ' + '(' + compressTime(Date.now() - timeStart) + ')')
 
-      const failures = codes.reduce((a, b) => a + b)
-      if (failures) {
-        console.log(chalk.red('\n\n  ' + failures + ' failing') + time)
-      } else {
-        console.log(chalk.green('\n\n  ' + testsPassed + ' passing') + time)
-      }
+    const failures = codes.reduce((a, b) => a + b)
+    if (failures) {
+      console.log(chalk.red('\n\n  ' + failures + ' failing') + time)
+    } else {
+      console.log(chalk.green('\n\n  ' + testsPassed + ' passing') + time)
+    }
 
-      cb(failures)
-    })
+    cb(failures)
   }
 }

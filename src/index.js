@@ -74,7 +74,7 @@ module.exports = class MochaWrapper extends Mocha {
           const title = suite.title
           if (title !== prevSuite) {
             prevSuite = title
-            console.log('# suite ' + title)
+            console.log('# suite ' + title.trim())
           }
         }
         runner.on('pass', test => {

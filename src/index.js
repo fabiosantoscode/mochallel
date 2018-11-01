@@ -6,7 +6,6 @@ const events = require('events')
 const path = require('path')
 const Mocha = require('mocha')
 const map = require('multiprocess-map')
-const TapParser = require('tap-parser')
 
 module.exports = class MochaWrapper extends Mocha {
   constructor (options) {
@@ -37,34 +36,57 @@ module.exports = class MochaWrapper extends Mocha {
       file: file,
       options: this.options
     }))
-    var p = new TapParser()
     const runner = new events.EventEmitter()
     /* eslint-disable-line */ new this._reporter(runner)
     runner.emit('start')
     let previousTest = Date.now()
-    p.on('line', line => {
-      const duration = Date.now() - previousTest
-      previousTest = Date.now()
-      if (/^(not )?ok/.test(line)) {
-        const passed = /^ok/.test(line)
-        const title = line.replace(/^(not )?ok/, '').trim()
-        if (passed) {
-          runner.emit('pass', { title, slow: () => 100, duration })
-        } else {
-          runner.emit('fail', { title })
-        }
-      }
-    })
+    let suite = ''
     const processStdout = stdout => {
-      p.write(stdout)
+      stdout.split(/\n/).forEach(line => {
+        const duration = Date.now() - previousTest
+        previousTest = Date.now()
+        if (/^# pass/.test(line)) {
+          const title = line.replace(/^# pass/, '').trim()
+          runner.emit('pass', { title, slow: () => 100, duration })
+        } else if (/^# fail/.test(line)) {
+          const title = line.replace(/^# fail/, '').trim()
+          runner.emit('fail', { title, fullTitle: () => title }, new Error(title))
+        } else if (/^# suite/.test(line)) {
+          const title = line.replace(/^# suite/, '').trim()
+          if (suite) {
+            runner.emit('suite end')
+          }
+          suite = title
+          if (title) runner.emit('suite', { title })
+        } else if (!/^#/.test(line)) {
+          console.log(line)
+        }
+      })
     }
 
     const codes = await map(testFiles, ({ file, options }) => {
       const Mocha = require('mocha')
       const Promise = require('es6-promise')
-      const mocha = new Mocha(options)
-
-      mocha.reporter('tap')
+      function Reporter (runner) {
+        let prevSuite
+        const onTest = test => {
+          const suite = runner.suite
+          const title = suite.title
+          if (title !== prevSuite) {
+            prevSuite = title
+            console.log('# suite ' + title)
+          }
+        }
+        runner.on('pass', test => {
+          onTest(test)
+          console.log('# pass ' + test.title.trim())
+        })
+        runner.on('fail', test => {
+          onTest(test)
+          console.log('# fail ' + test.title.trim())
+        })
+      }
+      const mocha = new Mocha(Object.assign(options, { reporter: Reporter }))
 
       mocha.addFile(file)
 
@@ -72,6 +94,8 @@ module.exports = class MochaWrapper extends Mocha {
         mocha.run(resolve)
       })
     }, { max: this.options.maxParallel, processStdout })
+
+    runner.emit('end')
 
     const failures = codes.reduce((a, b) => a + b)
 

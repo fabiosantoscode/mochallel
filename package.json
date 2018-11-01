@@ -10,7 +10,7 @@
   ],
   "main": "lib/index.js",
   "scripts": {
-    "test": "npm run prepare --silent && istanbul cover -x '**/vendor/**' ./node_modules/.bin/_mocha",
+    "test": "npm run prepare --silent && mocha",
     "coveralls": "coveralls < coverage/lcov.info",
     "prepare": "babel src -d lib",
     "precommit": "npm run lint --silent && npm run test --silent",
@@ -48,7 +48,6 @@
     "babel-polyfill": "^6.26.0",
     "commander": "^2.19.0",
     "coveralls": "^3.0.2",
-    "multiprocess-map": "^1.4.2",
-    "tap-parser": "^7.0.0"
+    "multiprocess-map": "^1.4.2"
   }
 }

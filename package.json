@@ -1,6 +1,6 @@
 {
   "name": "mochallel",
-  "version": "1.8.4",
+  "version": "1.8.5",
   "description": "Mocha tests running in parallel",
   "keywords": [
     "mocha",

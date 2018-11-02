@@ -9,6 +9,9 @@
     "test"
   ],
   "main": "lib/index.js",
+  "bin": {
+    "mochallel": "bin/mochallel"
+  },
   "scripts": {
     "test": "npm run prepare --silent && mocha",
     "coveralls": "coveralls < coverage/lcov.info",

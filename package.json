@@ -51,6 +51,6 @@
     "babel-polyfill": "^6.26.0",
     "commander": "^2.19.0",
     "coveralls": "^3.0.2",
-    "multiprocess-map": "^1.4.3"
+    "multiprocess-map": "^1.5.3"
   }
 }

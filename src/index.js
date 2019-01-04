@@ -50,7 +50,7 @@ module.exports = class MochaWrapper extends Mocha {
           runner.emit('pass', { title, slow: () => 100, duration })
         } else if (/^# fail/.test(line)) {
           const title = line.replace(/^# fail/, '').trim()
-          runner.emit('fail', { title, fullTitle: () => title }, new Error(title))
+          runner.emit('fail', { title, fullTitle: () => title, titlePath: () => [title] }, new Error(title))
         } else if (/^# suite/.test(line)) {
           const title = line.replace(/^# suite/, '').trim()
           if (suite) {

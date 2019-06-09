@@ -1,6 +1,5 @@
 'use strict'
 
-if (!global._babelPolyfill) require('babel-polyfill')
 const fs = require('fs')
 const events = require('events')
 const path = require('path')
@@ -66,7 +65,6 @@ module.exports = class MochaWrapper extends Mocha {
 
     const codes = await map(testFiles, ({ file, options }) => {
       const Mocha = require('mocha')
-      const Promise = require('es6-promise')
       function Reporter (runner) {
         let prevSuite
         const onTest = test => {

@@ -13,7 +13,7 @@
     "mochallel": "bin/mochallel"
   },
   "scripts": {
-    "test": "mocha",
+    "test": "mocha --reporter tap",
     "test:coverage": "istanbul cover node_modules/.bin/_mocha",
     "coveralls": "coveralls < coverage/lcov.info",
     "precommit": "npm run lint --silent && npm run test --silent",

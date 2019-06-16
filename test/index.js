@@ -25,7 +25,14 @@ describe('mochallel', function () {
   it('CLI works', function (done) {
     exec('node bin/mochallel test/tests/example', function (err, stdout, stderr) {
       if (err) throw err
-      assert(/2 passing/.test(stdout))
+      stdout = stdout.toString()
+      if (!/2 passing/.test(stdout)) {
+        const scissors = '---- 8< ----'
+        console.log('FAILURE: incorrect output:\n' + scissors)
+        console.log(stdout)
+        console.log(scissors)
+        throw new Error('did not find expected string in stdout (look at the cutout above)')
+      }
       done()
     })
   })

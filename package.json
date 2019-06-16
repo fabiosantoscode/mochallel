@@ -46,8 +46,8 @@
     "mocha": "^3.0.0"
   },
   "dependencies": {
-    "commander": "^2.19.0",
-    "multiprocess-map": "^1.5.3"
+    "multiprocess-map": "^1.5.3",
+    "yargs": "^13.2.4"
   },
   "peerDependencies": {
     "mocha": "^3 | ^4 | ^5"

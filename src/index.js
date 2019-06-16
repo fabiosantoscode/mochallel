@@ -48,8 +48,17 @@ module.exports = class MochaWrapper extends Mocha {
           const title = line.replace(/^# pass/, '').trim()
           runner.emit('pass', { title, slow: () => 100, duration })
         } else if (/^# fail/.test(line)) {
-          const title = line.replace(/^# fail/, '').trim()
-          runner.emit('fail', { title, fullTitle: () => title, titlePath: () => [title] }, new Error(title))
+          let [title, stacktrace] = line.split('\\\\n')
+
+          title = title.replace(/^# fail/, '').trim()
+          stacktrace = stacktrace.replace(/\\n/g, '\n')
+          let [message] = stacktrace.split('\n')
+          message = message.replace(/^Error: /, '').trim()
+
+          const error = new Error(message)
+          error.stack = stacktrace
+
+          runner.emit('fail', { title, fullTitle: () => title, titlePath: () => [title] }, error)
         } else if (/^# suite/.test(line)) {
           const title = line.replace(/^# suite/, '').trim()
           if (suite) {
@@ -67,7 +76,7 @@ module.exports = class MochaWrapper extends Mocha {
       const Mocha = require('mocha')
       function Reporter (runner) {
         let prevSuite
-        const onTest = test => {
+        const onTest = () => {
           const suite = runner.suite
           const title = suite.title
           if (title !== prevSuite) {
@@ -79,9 +88,9 @@ module.exports = class MochaWrapper extends Mocha {
           onTest(test)
           console.log('# pass ' + test.title.trim())
         })
-        runner.on('fail', test => {
+        runner.on('fail', (test, err) => {
           onTest(test)
-          console.log('# fail ' + test.title.trim())
+          console.log('# fail ' + test.title.trim() + '\\\\n' + err.stack.replace(/\n/g, '\\n'))
         })
       }
       const mocha = new Mocha(Object.assign(options, { reporter: Reporter }))

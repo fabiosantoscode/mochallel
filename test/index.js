@@ -2,7 +2,7 @@
 
 var assert = require('assert')
 var path = require('path')
-var child_process = require('child_process')
+var exec = require('child_process').exec
 var Mochallel = require('..')
 
 describe('mochallel', function () {
@@ -23,7 +23,7 @@ describe('mochallel', function () {
     })
   })
   it('CLI works', function (done) {
-    child_process.exec('bin/mochallel test/tests/example', function (err, stdout, stderr) {
+    exec('node bin/mochallel test/tests/example', function (err, stdout, stderr) {
       if (err) throw err
       assert(/2 passing/.test(stdout))
       done()

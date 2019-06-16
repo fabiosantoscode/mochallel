@@ -13,11 +13,11 @@
     "mochallel": "bin/mochallel"
   },
   "scripts": {
-    "test": "npm run prepare --silent && mocha",
+    "test": "mocha",
+    "test:coverage": "istanbul cover node_modules/.bin/_mocha",
     "coveralls": "coveralls < coverage/lcov.info",
-    "prepare": "babel src -d lib",
     "precommit": "npm run lint --silent && npm run test --silent",
-    "lint": "eslint --fix 'src/**/*.js' --ignore-pattern 'vendor'"
+    "lint": "eslint --fix 'lib/**/*.js'"
   },
   "repository": {
     "type": "git",
@@ -34,9 +34,6 @@
   },
   "homepage": "https://github.com/fabiosantoscode/mochallel#readme",
   "devDependencies": {
-    "@babel/cli": "^7.4.4",
-    "@babel/core": "^7.4.5",
-    "@babel/preset-env": "^7.4.5",
     "coveralls": "^3.0.2",
     "eslint": "^5.7.0",
     "eslint-config-standard": "^12.0.0",

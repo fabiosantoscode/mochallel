@@ -6,7 +6,7 @@ var exec = require('child_process').exec
 var Mochallel = require('..')
 
 describe('mochallel', function () {
-  this.timeout(4 * 1000)
+  this.timeout(16 * 1000)
   it('can spawn parallel mocha processes', function (done) {
     var mocha = new Mochallel({ maxParallel: 1 })
     mocha.addFile(path.join(__dirname, 'tests/example'))

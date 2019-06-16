@@ -1,6 +1,5 @@
 'use strict'
 
-if (!global._babelPolyfill) require('babel-polyfill')
 const fs = require('fs')
 const events = require('events')
 const path = require('path')

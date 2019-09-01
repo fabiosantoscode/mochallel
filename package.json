@@ -50,7 +50,7 @@
     "yargs": "^13.2.4"
   },
   "peerDependencies": {
-    "mocha": "^3 | ^4 | ^5"
+    "mocha": "^3 || ^4 || ^5"
   },
   "engines": {
     "node": ">= 6"

@@ -7,6 +7,7 @@ var Mochallel = require('..')
 
 describe('mochallel', function () {
   this.timeout(16 * 1000)
+
   it('can run failing tests', function (done) {
     var mocha = new Mochallel({ maxParallel: 1 })
     mocha.addFile(path.join(__dirname, 'tests/failing-test'))
@@ -15,6 +16,16 @@ describe('mochallel', function () {
       done()
     })
   })
+
+  it.only('runs hooks', done => {
+    const mocha = new Mochallel()
+    mocha.addFile(path.join(__dirname, 'tests/hooks'))
+    mocha.run((code) => {
+      assert.equal(code, 0)
+      done()
+    })
+  })
+
   it('can spawn parallel mocha processes', function (done) {
     var mocha = new Mochallel({ maxParallel: 1 })
     mocha.addFile(path.join(__dirname, 'tests/example'))
@@ -22,6 +33,7 @@ describe('mochallel', function () {
       done()
     })
   })
+
   it('CLI works', function (done) {
     exec('node bin/mochallel test/tests/example', function (err, stdout, stderr) {
       if (err) throw err
